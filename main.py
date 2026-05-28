@@ -10,9 +10,9 @@ from fastapi import Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from fastapi import HTTPException, status
-from models.employee import Employee
+
 from sqlalchemy import select
-from router.employee_router import router
+from employee.employee_router import router
 
 
 logging.basicConfig(
@@ -23,7 +23,7 @@ logging.basicConfig(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_tables()
+    # await create_tables()
     yield
 
 
@@ -32,7 +32,7 @@ app = FastAPI(
     title="Employee CRUD Application",
     description="Simple Employee management software",
     version="1.0.0",
-    lifespan=lifespan
+    # lifespan=lifespan
 )
 
 # app.add_middleware(RequestLoggingMiddleware)

@@ -9,7 +9,7 @@ from fastapi import Depends
 from fastapi import HTTPException, status
 
 from fastapi import APIRouter, Body
-import service.employee_service as emp_service
+import employee.employee_service as emp_service
 
 
 router = APIRouter(prefix="/api/v1", tags=["Employee"])
@@ -25,6 +25,8 @@ async def create_employee(body: dict = Body(...), db:AsyncSession = Depends(get_
 
 @router.get("/users", status_code=status.HTTP_200_OK)
 async def GetUsers(db:AsyncSession = Depends(get_db)):
+    name = "Alex"
+    print(f"{name}")
     employees = await emp_service.GetAllUsers(db=db)
     return employees
 
@@ -45,5 +47,6 @@ async def UpdateUserById(id:int, body  : dict = Body(...), db:AsyncSession = Dep
 
 @router.delete("/user/{id}", status_code=status.HTTP_200_OK)
 async def DeleteUserById(id:int, db:AsyncSession = Depends(get_db)):
+    
     deleted_employee = await emp_service.DeleteUserByIdService(id=id, db=db)
     return deleted_employee

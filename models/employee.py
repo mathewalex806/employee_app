@@ -6,9 +6,11 @@ from datetime import datetime
 from typing import Any, Optional
 
 from sqlalchemy import DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
+from models.address import Address
+from models.entity import Entity
 
 
 def _datetime_to_iso(value: datetime | None) -> str | None:
@@ -17,24 +19,20 @@ def _datetime_to_iso(value: datetime | None) -> str | None:
     return value.isoformat()
 
 
-class Employee(Base):
+class Employee(Entity):
     __tablename__ = "employees"
+    __abstract__= False
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, index=True)
+
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False,
+    age: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    addresses: Mapped[list["Address"]] = relationship(
+        "Address",
+        back_populates="employee",
     )
-    updated_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=True,
-    )
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    
+    
 
     def to_api_dict(self) -> dict[str, Any]:
         """JSON-friendly representation (ISO 8601 for timestamps)."""
