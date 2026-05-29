@@ -8,3 +8,10 @@ class LoginRequest(BaseModel):
 
 class TokenResponse(BaseModel):
     token : str
+
+
+class TokenPayload(BaseModel):
+    """Decoded JWT payload."""
+
+    id: int
+    email: str
