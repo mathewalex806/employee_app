@@ -1,18 +1,11 @@
-from fastapi import FastAPI
-from dataclasses import dataclass
-from typing import TypedDict
-from middleware.logging import RequestLoggingMiddleware
-import logging
-from fastapi.middleware.cors import CORSMiddleware
-from database.connection import create_tables, get_db
-from contextlib import asynccontextmanager
-from fastapi import Body
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
-from fastapi import HTTPException, status
+from fastapi import FastAPI, Request
 
-from sqlalchemy import select
+from fastapi.responses import JSONResponse
+import logging
+from contextlib import asynccontextmanager
+from exceptions import NotFoundException
 from employee import router
+from exceptions.handlers import register_exception_handlers
 
 
 logging.basicConfig(
@@ -34,6 +27,8 @@ app = FastAPI(
     version="1.0.0",
     # lifespan=lifespan
 )
+
+register_exception_handlers(app)
 
 # app.add_middleware(RequestLoggingMiddleware)
 # app.add_middleware(

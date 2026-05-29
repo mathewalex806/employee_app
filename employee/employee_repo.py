@@ -9,6 +9,7 @@ from models.employee import Employee
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
+from exceptions import NotFoundException
 
 async def CreateEmployee(name: str, email: str, db: AsyncSession)-> Employee:
     db_employee = Employee(name=name, email= email)
@@ -18,7 +19,7 @@ async def CreateEmployee(name: str, email: str, db: AsyncSession)-> Employee:
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already in use")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already in use")
     await db.refresh(db_employee)
     return db_employee
 
@@ -33,8 +34,8 @@ async def GetUserById(id:int, db:AsyncSession):
     
     result = await db.scalars(query)
     employee = result.first()
-    if query is None or employee is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No employee found")
+    if result is None or employee is None:
+        raise NotFoundException("Employee not found")
     return employee
 
 
