@@ -10,30 +10,30 @@ from fastapi import HTTPException, status
 
 from fastapi import APIRouter, Body
 import employee.employee_service as emp_service
-from employee.schemas import EmployeeCreate, AddressCreate
+from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse
 
 router = APIRouter(prefix="/api/v1", tags=["Employee"])
 
-@router.post("/employee", status_code=status.HTTP_201_CREATED)
+@router.post("/employee", status_code=status.HTTP_201_CREATED, response_model=EmployeeResponse)
 async def create_employee(body: EmployeeCreate, db:AsyncSession = Depends(get_db)):
     name = body.name
     email = body.email
 
     employee =  await emp_service.create(db=db, name=name, email=email)
-    return employee.to_api_dict()
+    return employee
 
 
-@router.get("/users", status_code=status.HTTP_200_OK)
+@router.get("/users", status_code=status.HTTP_200_OK, response_model= list[EmployeeResponse])
 async def GetUsers(db:AsyncSession = Depends(get_db)):
     name = "Alex"
     print(f"{name}")
     employees = await emp_service.GetAllUsers(db=db)
     return employees
 
-@router.get("/user/{id}", status_code=status.HTTP_200_OK)
+@router.get("/user/{id}", status_code=status.HTTP_200_OK, response_model= EmployeeResponse)
 async def GetUserById(id:int, db:AsyncSession = Depends(get_db)):
     employee = await emp_service.GetUserById(id=id, db=db)
-    return employee.to_api_dict()
+    return employee
 
 
 @router.put("/user/{id}", status_code=status.HTTP_200_OK)
