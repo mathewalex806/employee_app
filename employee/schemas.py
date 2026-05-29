@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator, EmailStr, model_validator
 
 
@@ -39,3 +41,12 @@ class EmployeeResponse(BaseModel):
     email : EmailStr
     age : int | None
 
+class EmployeeResponseByUserId(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id : int 
+    name : str
+    email : EmailStr
+    age : int | None
+    created_at : datetime
+    updated_at : datetime | None
+    deleted_at : datetime | None

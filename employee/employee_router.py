@@ -10,7 +10,7 @@ from fastapi import HTTPException, status
 
 from fastapi import APIRouter, Body
 import employee.employee_service as emp_service
-from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse
+from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse, EmployeeResponseByUserId
 
 router = APIRouter(prefix="/api/v1", tags=["Employee"])
 
@@ -30,13 +30,13 @@ async def GetUsers(db:AsyncSession = Depends(get_db)):
     employees = await emp_service.GetAllUsers(db=db)
     return employees
 
-@router.get("/user/{id}", status_code=status.HTTP_200_OK, response_model= EmployeeResponse)
+@router.get("/user/{id}", status_code=status.HTTP_200_OK, response_model= EmployeeResponseByUserId)
 async def GetUserById(id:int, db:AsyncSession = Depends(get_db)):
     employee = await emp_service.GetUserById(id=id, db=db)
     return employee
 
 
-@router.put("/user/{id}", status_code=status.HTTP_200_OK)
+@router.put("/user/{id}", status_code=status.HTTP_200_OK, response_model=EmployeeResponse)
 async def UpdateUserById(id:int, body  : dict = Body(...), db:AsyncSession = Depends(get_db)):
     name = body.get("name")
     email = body.get("email")
