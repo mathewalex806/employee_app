@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class AddressCreate(BaseModel):
@@ -6,6 +6,12 @@ class AddressCreate(BaseModel):
     city : str
     postal_code : int 
     country : str
+
+    @field_validator("postal_code")
+    @classmethod
+    def validate_postal_code(cls,v : str):
+        if not v.isdigit():
+            raise ValueError("Postal code is incorrect")
 
 
 class EmployeeCreate(BaseModel):
