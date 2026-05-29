@@ -11,8 +11,8 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
 from exceptions import NotFoundException, BadRequestException, ConflictException
 
-async def CreateEmployee(name: str, email: str, db: AsyncSession)-> Employee:
-    db_employee = Employee(name=name, email= email)
+async def CreateEmployee(name: str, email: str, password : str,db: AsyncSession)-> Employee:
+    db_employee = Employee(name=name, email= email, password_hash = password)
     db.add(db_employee)
 
     try:
@@ -76,6 +76,11 @@ async def DeleteUserByIdRepo(id:int, db:AsyncSession):
         raise BadRequestException("Operation failed")
     await db.refresh(employee)
     return {"message":"Record Deleted"}
+
+
+async def GetByEmail(db:AsyncSession, email: str) -> Employee | None:
+    query =  await select(Employee).where(Employee.email == email, Employee.deleted_at.is_(None))
+    return query.scalars(query).first()
 
 
 

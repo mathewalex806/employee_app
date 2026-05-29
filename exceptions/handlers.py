@@ -22,11 +22,15 @@ class BadRequestException(AppException):
     """Client input is invalid in a way Pydantic validation didn't catch."""
 
 
+class UnauthorizedException(AppException):
+    """Unauthorized Exception"""
+
 
 _STATUS_MAP : dict[type[AppException], int] = {
     NotFoundException : status.HTTP_404_NOT_FOUND,
     ConflictException: status.HTTP_409_CONFLICT,
-    BadRequestException :  status.HTTP_400_BAD_REQUEST
+    BadRequestException :  status.HTTP_400_BAD_REQUEST,
+    UnauthorizedException : status.HTTP_401_UNAUTHORIZED
 }
 
 def register_exception_handlers(app:FastAPI) ->None:

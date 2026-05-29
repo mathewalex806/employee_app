@@ -8,16 +8,21 @@ from fastapi import HTTPException, status
 from models.employee import Employee
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo
-from exceptions import BadRequestException, ConflictException, NotFoundException
+from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo, GetByEmail
+from exceptions import BadRequestException, ConflictException, NotFoundException , UnauthorizedException
+from auth import hash_password, verify_password
 
-async def create(db: AsyncSession, name: str, email:str) -> Employee:
+async def create(db: AsyncSession, name: str, email:str, password:str) -> Employee:
     if not isinstance(name, str) or not name.strip():
         raise BadRequestException("Name should not be empty")
     if not isinstance(email, str) or not email.strip():
         raise BadRequestException("Email should not be empty")
+    if not isinstance(password, str) or not password.strip():
+        raise BadRequestException("Password Field should not be empty")
     
-    employee = await CreateEmployee(db=db, name=name, email=email)
+    hashed_password = hash_password(password)
+    
+    employee = await CreateEmployee(db=db, name=name, email=email, password = hashed_password)
     return employee
 
 
@@ -49,3 +54,14 @@ async def DeleteUserByIdService(id:int, db: AsyncSession):
     
     deleted_employee = await DeleteUserByIdRepo(id=id, db=db)
     return deleted_employee
+
+
+async def login(db: AsyncSession, email:str, password: str)-> str:
+    employee = await GetByEmail(db, email=email)
+    if employee is None:
+        raise NotFoundException("User not found")
+    
+    if not verify_password(plain=password, hashed=employee.password_hash):
+        raise UnauthorizedException("User password does not match")
+    
+    return {"message":"Password match"}
