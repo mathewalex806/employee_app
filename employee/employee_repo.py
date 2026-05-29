@@ -9,7 +9,7 @@ from models.employee import Employee
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
-from exceptions import NotFoundException
+from exceptions import NotFoundException, BadRequestException, ConflictException
 
 async def CreateEmployee(name: str, email: str, db: AsyncSession)-> Employee:
     db_employee = Employee(name=name, email= email)
@@ -19,7 +19,7 @@ async def CreateEmployee(name: str, email: str, db: AsyncSession)-> Employee:
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already in use")
+        raise ConflictException("Email already in use")
     await db.refresh(db_employee)
     return db_employee
 
@@ -43,6 +43,8 @@ async def UpdateUserByIdRepo(id:int, name: str,email: str,db:AsyncSession):
     query = select(Employee).where(Employee.id == id)
     result = await db.scalars(query)
     employee = result.first()
+    if employee is None:
+        raise NotFoundException("User not found")
     employee.name= name
     employee.email = email
 
@@ -50,7 +52,7 @@ async def UpdateUserByIdRepo(id:int, name: str,email: str,db:AsyncSession):
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        raise BadRequestException("Failed to update employee")
     await db.refresh(employee)
     return employee
 
@@ -60,7 +62,7 @@ async def DeleteUserByIdRepo(id:int, db:AsyncSession):
     result = await db.scalars(query)
     employee = result.first()
     if employee is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Employee does not exist")
+        raise NotFoundException("User not found")
     if employee.deleted_at is not None:
         return {"message":"Employee does not exist"}
     employee.deleted_at = datetime.now(timezone.utc)
@@ -71,7 +73,7 @@ async def DeleteUserByIdRepo(id:int, db:AsyncSession):
         print(e)
         await db.rollback()
 
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        raise BadRequestException("Operation failed")
     await db.refresh(employee)
     return {"message":"Record Deleted"}
 

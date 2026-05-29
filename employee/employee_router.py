@@ -37,9 +37,10 @@ async def GetUserById(id:int, db:AsyncSession = Depends(get_db)):
 
 
 @router.put("/user/{id}", status_code=status.HTTP_200_OK, response_model=EmployeeResponse)
-async def UpdateUserById(id:int, body  : dict = Body(...), db:AsyncSession = Depends(get_db)):
-    name = body.get("name")
-    email = body.get("email")
+async def UpdateUserById(id:int, body  : EmployeeCreate, db:AsyncSession = Depends(get_db)):
+    name = body.name
+    email = body.email
+    
 
     updated_employee = await emp_service.UpdateUserByIdService(db=db, name=name, email=email, id=id)
     return updated_employee
