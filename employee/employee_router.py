@@ -10,14 +10,14 @@ from fastapi import HTTPException, status
 
 from fastapi import APIRouter, Body
 import employee.employee_service as emp_service
-
+from employee.schemas import EmployeeCreate, AddressCreate
 
 router = APIRouter(prefix="/api/v1", tags=["Employee"])
 
 @router.post("/employee", status_code=status.HTTP_201_CREATED)
-async def create_employee(body: dict = Body(...), db:AsyncSession = Depends(get_db)):
-    name = body.get("name")
-    email = body.get("email")
+async def create_employee(body: EmployeeCreate, db:AsyncSession = Depends(get_db)):
+    name = body.name
+    email = body.email
 
     employee =  await emp_service.create(db=db, name=name, email=email)
     return employee.to_api_dict()
