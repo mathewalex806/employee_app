@@ -78,9 +78,6 @@ async def DeleteUserByIdRepo(id:int, db:AsyncSession):
     return {"message":"Record Deleted"}
 
 
-async def GetByEmail(db:AsyncSession, email: str) -> Employee | None:
-    query =  await select(Employee).where(Employee.email == email, Employee.deleted_at.is_(None))
-    return query.scalars(query).first()
 
 
 

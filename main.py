@@ -7,7 +7,7 @@ from exceptions import NotFoundException
 from employee import router
 from exceptions.handlers import register_exception_handlers
 from middleware import configureMiddleware
-
+from auth import auth_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,7 +36,7 @@ register_exception_handlers(app)
 
 app.include_router(router)
 
-
+app.include_router(auth_router)
 
 
 

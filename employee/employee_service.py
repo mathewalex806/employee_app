@@ -8,9 +8,10 @@ from fastapi import HTTPException, status
 from models.employee import Employee
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo, GetByEmail
+from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo
 from exceptions import BadRequestException, ConflictException, NotFoundException , UnauthorizedException
-from auth import hash_password, verify_password
+from auth import hash_password, verify_password, create_access_token, decode_access_token
+
 
 async def create(db: AsyncSession, name: str, email:str, password:str) -> Employee:
     if not isinstance(name, str) or not name.strip():
@@ -56,12 +57,4 @@ async def DeleteUserByIdService(id:int, db: AsyncSession):
     return deleted_employee
 
 
-async def login(db: AsyncSession, email:str, password: str)-> str:
-    employee = await GetByEmail(db, email=email)
-    if employee is None:
-        raise NotFoundException("User not found")
-    
-    if not verify_password(plain=password, hashed=employee.password_hash):
-        raise UnauthorizedException("User password does not match")
-    
-    return {"message":"Password match"}
+

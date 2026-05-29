@@ -9,7 +9,7 @@ from fastapi import Depends
 from fastapi import HTTPException, status
 
 from fastapi import APIRouter, Body
-from employee.employee_repo import GetByEmail
+
 import employee.employee_service as emp_service
 from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse, EmployeeResponseByUserId
 
@@ -55,10 +55,10 @@ async def DeleteUserById(id:int, db:AsyncSession = Depends(get_db)):
     return deleted_employee
 
 
-@router.post("/login", status_code=status.HTTP_200_OK)
-async def LoginUserByEmail(body: dict = Body(...), db:AsyncSession = Depends(get_db)):
-    email = body.get("email")
-    password = body.get("password")
+# @router.post("/login", status_code=status.HTTP_200_OK)
+# async def LoginUserByEmail(body: dict = Body(...), db:AsyncSession = Depends(get_db)):
+#     email = body.get("email")
+#     password = body.get("password")
 
-    response = await emp_service.login(email=email, password=password, db=db)
-    return response
+#     response = await emp_service.login(email=email, password=password, db=db)
+#     return response
