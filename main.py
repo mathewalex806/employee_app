@@ -12,7 +12,7 @@ from fastapi import Depends
 from fastapi import HTTPException, status
 
 from sqlalchemy import select
-from employee.employee_router import router
+from employee import router
 
 
 logging.basicConfig(

@@ -30,9 +30,11 @@ async def GetAllEmployee(db:AsyncSession = AsyncSession):
 
 async def GetUserById(id:int, db:AsyncSession):
     query = select(Employee).where(Employee.id == id)
+    
     result = await db.scalars(query)
     employee = result.first()
-
+    if query is None or employee is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No employee found")
     return employee
 
 

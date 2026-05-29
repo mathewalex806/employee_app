@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from config import DATABASE_URL
+from config import settings
 from database.connection import Base
 import asyncio
 # Import every ORM module so each Table registers on Base.metadata.
@@ -18,7 +18,7 @@ import asyncio
 import models.employee  # noqa: F401
 import models.address
 import models.department
-
+from database import DATABASE_URL
 config = context.config
 
 # Wire Python logging from alembic.ini ([loggers]/[handlers]/...). Optional but lets
