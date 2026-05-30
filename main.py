@@ -8,7 +8,7 @@ from employee import router
 from exceptions.handlers import register_exception_handlers
 from middleware import configureMiddleware
 from auth import auth_router
-
+from department import dept_router
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
@@ -37,7 +37,7 @@ register_exception_handlers(app)
 app.include_router(router)
 
 app.include_router(auth_router)
-
+app.include_router(dept_router)
 
 
 def main():
