@@ -1,5 +1,6 @@
 """
 Employee entity — ORM mapped class for table `employees`.
+Register all new models in env.py file 
 """
 
 from datetime import datetime
@@ -11,6 +12,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 from models.address import Address
 from models.entity import Entity
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from models.department import Department
+    from models.employee_department_junction import EmployeeDepartmentJunction
+
 
 
 def _datetime_to_iso(value: datetime | None) -> str | None:
@@ -32,8 +38,11 @@ class Employee(Entity):
         "Address",
         back_populates="employee",
     )
-    
-    
+    departments: Mapped[list["Department"]] = relationship(
+        "Department",
+        secondary="employee_department",
+        back_populates="employees",
+    )
 
     def to_api_dict(self) -> dict[str, Any]:
         """JSON-friendly representation (ISO 8601 for timestamps)."""

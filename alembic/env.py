@@ -18,6 +18,7 @@ import asyncio
 import models.employee  # noqa: F401
 import models.address
 import models.department
+import models.employee_department_junction
 from database import DATABASE_URL
 config = context.config
 
