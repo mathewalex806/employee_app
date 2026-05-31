@@ -8,7 +8,7 @@ from fastapi import HTTPException, status
 from models.employee import Employee
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo
+from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo, AddEmployeeToDepartment, DeleteEmployeeFromDepartment
 from exceptions import BadRequestException, ConflictException, NotFoundException , UnauthorizedException
 from auth import hash_password, verify_password, create_access_token, decode_access_token
 
@@ -58,3 +58,20 @@ async def DeleteUserByIdService(id:int, db: AsyncSession):
 
 
 
+async def AddEmployeeToDepartmentService(emp_id: int, dept_id : int, db : AsyncSession):
+    if not isinstance(emp_id, int) or emp_id is None:
+        raise BadRequestException("Employee ID should not be empty")
+    if not isinstance(dept_id, int) or dept_id is None:
+        raise BadRequestException("Department ID should not be empty")
+    
+    result = await AddEmployeeToDepartment(emp_id=emp_id, dept_id=dept_id, db=db)
+    return result
+
+async def DeleteEmployeeFromDepartmentService(emp_id: int, dept_id: int, db: AsyncSession):
+    if not isinstance(emp_id, int) or emp_id is None:
+        raise BadRequestException("Employee ID should not be empty")
+    if not isinstance(dept_id, int) or dept_id is None:
+        raise BadRequestException("Department ID should not be empty")
+    
+    result = await DeleteEmployeeFromDepartment(emp_id=emp_id, dept_id=dept_id, db=db)
+    return result

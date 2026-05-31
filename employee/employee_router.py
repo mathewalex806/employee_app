@@ -57,6 +57,21 @@ async def DeleteUserById(id:int, db:AsyncSession = Depends(get_db)):
     return deleted_employee
 
 
+@router.post("/employee/{emp_id}/department/{dept_id}", status_code=status.HTTP_200_OK)
+async def AddEmployeeToDepartment(emp_id: int, dept_id : int, db : AsyncSession = Depends(get_db)):
+    result = await emp_service.AddEmployeeToDepartmentService(emp_id=emp_id, dept_id=dept_id, db=db)
+    return result
+
+
+
+@router.delete("/employee/{emp_id}/department/{dept_id}", status_code=status.HTTP_200_OK)
+async def DeleteEmployeeFromDepartment(emp_id: int, dept_id : int, db : AsyncSession = Depends(get_db)):
+    result = await emp_service.DeleteEmployeeFromDepartmentService(emp_id=emp_id, dept_id=dept_id, db=db)
+    return result
+
+
+
+
 # @router.post("/login", status_code=status.HTTP_200_OK)
 # async def LoginUserByEmail(body: dict = Body(...), db:AsyncSession = Depends(get_db)):
 #     email = body.get("email")

@@ -2,6 +2,7 @@
 Employee repo
 """
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from database.connection import create_tables, get_db
 from fastapi import Depends
 from fastapi import HTTPException, status
@@ -10,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
 from exceptions import NotFoundException, BadRequestException, ConflictException
+from models import Department
 
 async def CreateEmployee(name: str, email: str, password : str,db: AsyncSession)-> Employee:
     db_employee = Employee(name=name, email= email, password_hash = password)
@@ -79,6 +81,62 @@ async def DeleteUserByIdRepo(id:int, db:AsyncSession):
 
 
 
+async def AddEmployeeToDepartment(emp_id: int, dept_id : int, db : AsyncSession):
+    employee_query = select(Employee).where(Employee.id == emp_id)
+    department_query = select(Department).where(Department.id == dept_id)
+
+    employee_result = await db.scalars(employee_query)
 
 
+    employee = employee_result.first()
 
+
+    department_result = await db.scalars(department_query)
+    department = department_result.first()
+
+    if employee is None:
+        raise NotFoundException("Employee not found")
+    if department is None:
+        raise NotFoundException("Department not found")
+    
+    employee.departments.append(department)
+
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise BadRequestException("Employee is already in the department")
+
+    await db.refresh(employee)
+    return employee
+
+
+async def DeleteEmployeeFromDepartment(emp_id: int, dept_id :int , db = AsyncSession):
+    employee_query = select(Employee).where(Employee.id == emp_id)
+    department_query = select(Department).where(Department.id == dept_id)
+
+    employee_result = await db.scalars(employee_query)
+    employee = employee_result.first()
+
+    department_result = await db.scalars(department_query)
+    department = department_result.first()
+
+    if employee is None:
+        raise NotFoundException("Employee not found")
+    if department is None:
+        raise NotFoundException("Department not found")
+    
+    if department not in employee.departments:
+        raise BadRequestException("Employee is not in the department")
+    
+    employee.departments.remove(department)
+
+    try:
+        await db.commit()
+    except Exception as e:
+        print(e)
+        await db.rollback()
+        raise BadRequestException("Operation failed")
+
+    await db.refresh(employee)
+    return employee

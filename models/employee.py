@@ -42,6 +42,7 @@ class Employee(Entity):
         "Department",
         secondary="employee_department",
         back_populates="employees",
+        lazy="selectin",
     )
 
     def to_api_dict(self) -> dict[str, Any]:
