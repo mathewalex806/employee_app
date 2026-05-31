@@ -37,6 +37,7 @@ class Employee(Entity):
     addresses: Mapped[list["Address"]] = relationship(
         "Address",
         back_populates="employee",
+        lazy="selectin",
     )
     departments: Mapped[list["Department"]] = relationship(
         "Department",

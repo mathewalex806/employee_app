@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 from database.connection import create_tables, get_db
 from fastapi import Depends
 from fastapi import HTTPException, status
+from models.address import Address
 from models.employee import Employee
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -140,3 +141,30 @@ async def DeleteEmployeeFromDepartment(emp_id: int, dept_id :int , db = AsyncSes
 
     await db.refresh(employee)
     return employee
+
+
+async def AddUserAddress(emp_id : int, address_data : dict, db : AsyncSession):
+    employee_query = select(Employee).where(Employee.id == emp_id)
+    employee_result = await db.scalars(employee_query)
+    empolyee = employee_result.first()
+    if empolyee is None:
+        raise NotFoundException("Employee not found")
+    
+    address = Address(
+        line_1 = address_data.get("line1", None),
+        city = address_data.get("city", None),
+        postal_code = int(address_data.get("postal_code", None)),
+        country = address_data.get("country", None),
+        employee_id = emp_id
+
+    )
+    empolyee.addresses.append(address)
+
+    try:
+        await db.commit()
+    except Exception as e:
+        print(e)
+        await db.rollback()
+        raise BadRequestException("Failed to add address")
+    await db.refresh(empolyee)
+    return empolyee

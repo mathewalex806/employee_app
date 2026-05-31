@@ -8,7 +8,7 @@ from fastapi import HTTPException, status
 from models.employee import Employee
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo, AddEmployeeToDepartment, DeleteEmployeeFromDepartment
+from employee.employee_repo import CreateEmployee, GetAllEmployee, GetUserById, UpdateUserByIdRepo, DeleteUserByIdRepo, AddEmployeeToDepartment, DeleteEmployeeFromDepartment, AddUserAddress
 from exceptions import BadRequestException, ConflictException, NotFoundException , UnauthorizedException
 from auth import hash_password, verify_password, create_access_token, decode_access_token
 
@@ -74,4 +74,13 @@ async def DeleteEmployeeFromDepartmentService(emp_id: int, dept_id: int, db: Asy
         raise BadRequestException("Department ID should not be empty")
     
     result = await DeleteEmployeeFromDepartment(emp_id=emp_id, dept_id=dept_id, db=db)
+    return result
+
+async def AddUserAddressService(emp_id: int, address_data: dict, db: AsyncSession):
+    if not isinstance(emp_id, int) or emp_id is None:
+        raise BadRequestException("Employee ID should not be empty")
+    if not isinstance(address_data, dict) or not address_data:
+        raise BadRequestException("Address data should not be empty")
+    
+    result = await AddUserAddress(emp_id=emp_id, address_data=address_data, db=db)
     return result

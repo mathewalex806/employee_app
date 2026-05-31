@@ -24,7 +24,7 @@ class AddressCreate(BaseModel):
         elif country in ("IN") and len(self.postal_code) !=6:
             raise ValueError("Indian postal code length is 6")
         
-
+        return self
 
 class EmployeeCreate(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra='forbid')

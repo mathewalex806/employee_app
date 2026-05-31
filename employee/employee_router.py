@@ -70,7 +70,20 @@ async def DeleteEmployeeFromDepartment(emp_id: int, dept_id : int, db : AsyncSes
     return result
 
 
-
+@router.post("/employee/{emp_id}/address", status_code=status.HTTP_201_CREATED)
+async def AddUserAddress(emp_id: int, body: AddressCreate, db: AsyncSession = Depends(get_db)):
+    line1 = body.line1
+    city = body.city
+    postal_code = body.postal_code
+    country = body.country
+    address = {
+        "line1": line1,
+        "city": city,
+        "postal_code": postal_code,
+        "country": country
+    }
+    result = await emp_service.AddUserAddressService(emp_id=emp_id, address_data=address, db=db)
+    return result
 
 # @router.post("/login", status_code=status.HTTP_200_OK)
 # async def LoginUserByEmail(body: dict = Body(...), db:AsyncSession = Depends(get_db)):
