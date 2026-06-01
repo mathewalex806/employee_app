@@ -1,25 +1,24 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 
-from fastapi.responses import JSONResponse
 import logging
 from contextlib import asynccontextmanager
-from exceptions import NotFoundException
 from employee import router
 from exceptions.handlers import register_exception_handlers
 from middleware import configureMiddleware
 from auth import auth_router
 from department import dept_router
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # await create_tables()
     yield
-
 
 
 app = FastAPI(

@@ -1,24 +1,24 @@
 """
 Employee entity — ORM mapped class for table `employees`.
-Register all new models in env.py file 
+Register all new models in env.py file
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
-from sqlalchemy import DateTime, Integer, String, func
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
 from models.address import Address
 from models.entity import Entity
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from models.department import Department
-    from models.employee_department_junction import EmployeeDepartmentJunction
 
 import enum
 from sqlalchemy import Enum
+
 
 def _datetime_to_iso(value: datetime | None) -> str | None:
     if value is None:
@@ -35,19 +35,21 @@ class EmployeeRole(str, enum.Enum):
 
 class Employee(Entity):
     __tablename__ = "employees"
-    __abstract__= False
-
+    __abstract__ = False
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    password_hash : Mapped[str] = mapped_column(String(255), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    role : Mapped[EmployeeRole] = mapped_column(
-        Enum(EmployeeRole, name="employeerole",values_callable=lambda enum_cls: [e.value for e in enum_cls]),
+    role: Mapped[EmployeeRole] = mapped_column(
+        Enum(
+            EmployeeRole,
+            name="employeerole",
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
         nullable=False,
-        server_default=EmployeeRole.DEVELOPER.value
-            
+        server_default=EmployeeRole.DEVELOPER.value,
     )
     addresses: Mapped[list["Address"]] = relationship(
         "Address",

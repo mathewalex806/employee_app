@@ -7,8 +7,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.entity import Entity
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from models import Employee
+
+
 class Address(Entity):
     __tablename__ = "address"
 

@@ -1,4 +1,3 @@
-
 """
 Auth Service file
 """
@@ -16,9 +15,11 @@ from models.employee import Employee
 #     return employee.first()
 
 
-async def login(db: AsyncSession,email: str,password: str) -> str:
+async def login(db: AsyncSession, email: str, password: str) -> str:
 
-    query = select(Employee).where(Employee.email == email,Employee.deleted_at.is_(None))
+    query = select(Employee).where(
+        Employee.email == email, Employee.deleted_at.is_(None)
+    )
 
     result = await db.scalars(query)
     employee = result.first()
@@ -26,15 +27,11 @@ async def login(db: AsyncSession,email: str,password: str) -> str:
     if employee is None:
         raise UnauthorizedException("Invalid credentials")
 
-    if not verify_password(plain=password,hashed=employee.password_hash):
+    if not verify_password(plain=password, hashed=employee.password_hash):
         raise UnauthorizedException("Invalid credentials")
 
     token = create_access_token(
-        {
-            "sub": str(employee.id),
-            "email": employee.email,
-            "role": employee.role.value
-        }
+        {"sub": str(employee.id), "email": employee.email, "role": employee.role.value}
     )
 
     return token

@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from exceptions import NotFoundException, BadRequestException, ConflictException
 from models.department import Department
 
+
 async def CreateDepartmentRepo(name: str, db: AsyncSession):
 
     department = Department(name=name)
@@ -21,6 +22,7 @@ async def CreateDepartmentRepo(name: str, db: AsyncSession):
     await db.refresh(department)
     return department
 
+
 async def GetDepartmentByIdRepo(id: int, db: AsyncSession):
     query = select(Department).where(Department.id == id)
     result = await db.scalars(query)
@@ -29,19 +31,21 @@ async def GetDepartmentByIdRepo(id: int, db: AsyncSession):
         raise NotFoundException("Department not found")
     return department
 
-async def GetAllDepartmentsRepo(db:AsyncSession):
+
+async def GetAllDepartmentsRepo(db: AsyncSession):
     query = select(Department).where(Department.deleted_at.is_(None))
     result = await db.scalars(query)
     return result.all()
 
+
 async def UpdateDepartmentByIdRepo(id: int, name: str, db: AsyncSession):
-    query = select(Department).where(Department.id == id )
+    query = select(Department).where(Department.id == id)
     result = await db.scalars(query)
     department = result.first()
 
     if department is None:
         raise NotFoundException("Department not found")
-    
+
     department.name = name
 
     try:
@@ -53,9 +57,8 @@ async def UpdateDepartmentByIdRepo(id: int, name: str, db: AsyncSession):
     return department
 
 
-
 async def DeleteDepartmentByIdRepo(id: int, db: AsyncSession):
-    query =  select(Department).where(Department.id == id)
+    query = select(Department).where(Department.id == id)
     result = await db.scalars(query)
     department = result.first()
     if department is None:

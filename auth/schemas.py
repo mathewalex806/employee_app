@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field, field_validator, EmailStr, model_validator
+from pydantic import BaseModel, Field, EmailStr
 
 from models.employee import EmployeeRole
 
@@ -9,8 +9,8 @@ class LoginRequest(BaseModel):
 
 
 class TokenResponse(BaseModel):
-    token : str
-    refresh_token : str
+    token: str
+    refresh_token: str
 
 
 class TokenPayload(BaseModel):
@@ -21,9 +21,11 @@ class TokenPayload(BaseModel):
     type: str | None = None
     role: EmployeeRole
 
+
 class TokenRefresh(BaseModel):
-    refresh_token:str
+    refresh_token: str
+
 
 class AccessToken(BaseModel):
-    access_token : str
+    access_token: str
     token_type: str = "bearer"

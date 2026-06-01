@@ -1,11 +1,8 @@
 """
 Employee repo
 """
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from database.connection import create_tables, get_db
-from fastapi import Depends
-from fastapi import HTTPException, status
 from models.address import Address
 from models.employee import Employee
 from sqlalchemy import select
@@ -14,8 +11,13 @@ from datetime import datetime, timezone
 from exceptions import NotFoundException, BadRequestException, ConflictException
 from models import Department
 
-async def CreateEmployee(name: str, email: str, password : str,role : str,age : int,db: AsyncSession)-> Employee:
-    db_employee = Employee(name=name, email= email, password_hash = password, role= role, age= age)
+
+async def CreateEmployee(
+    name: str, email: str, password: str, role: str, age: int, db: AsyncSession
+) -> Employee:
+    db_employee = Employee(
+        name=name, email=email, password_hash=password, role=role, age=age
+    )
     db.add(db_employee)
 
     try:
@@ -26,15 +28,16 @@ async def CreateEmployee(name: str, email: str, password : str,role : str,age : 
     await db.refresh(db_employee)
     return db_employee
 
-async def GetAllEmployee(db:AsyncSession = AsyncSession):
+
+async def GetAllEmployee(db: AsyncSession = AsyncSession):
     query = select(Employee).where(Employee.deleted_at.is_(None))
     result = await db.scalars(query)
     return result.all()
 
 
-async def GetUserById(id:int, db:AsyncSession):
+async def GetUserById(id: int, db: AsyncSession):
     query = select(Employee).where(Employee.id == id)
-    
+
     result = await db.scalars(query)
     employee = result.first()
     if result is None or employee is None:
@@ -42,13 +45,13 @@ async def GetUserById(id:int, db:AsyncSession):
     return employee
 
 
-async def UpdateUserByIdRepo(id:int, name: str,email: str,db:AsyncSession):
+async def UpdateUserByIdRepo(id: int, name: str, email: str, db: AsyncSession):
     query = select(Employee).where(Employee.id == id)
     result = await db.scalars(query)
     employee = result.first()
     if employee is None:
         raise NotFoundException("User not found")
-    employee.name= name
+    employee.name = name
     employee.email = email
 
     try:
@@ -60,16 +63,16 @@ async def UpdateUserByIdRepo(id:int, name: str,email: str,db:AsyncSession):
     return employee
 
 
-async def DeleteUserByIdRepo(id:int, db:AsyncSession):
+async def DeleteUserByIdRepo(id: int, db: AsyncSession):
     query = select(Employee).where(Employee.id == id)
     result = await db.scalars(query)
     employee = result.first()
     if employee is None:
         raise NotFoundException("User not found")
     if employee.deleted_at is not None:
-        return {"message":"Employee does not exist"}
+        return {"message": "Employee does not exist"}
     employee.deleted_at = datetime.now(timezone.utc)
-    
+
     try:
         await db.commit()
     except Exception as e:
@@ -78,19 +81,16 @@ async def DeleteUserByIdRepo(id:int, db:AsyncSession):
 
         raise BadRequestException("Operation failed")
     await db.refresh(employee)
-    return {"message":"Record Deleted"}
+    return {"message": "Record Deleted"}
 
 
-
-async def AddEmployeeToDepartment(emp_id: int, dept_id : int, db : AsyncSession):
+async def AddEmployeeToDepartment(emp_id: int, dept_id: int, db: AsyncSession):
     employee_query = select(Employee).where(Employee.id == emp_id)
     department_query = select(Department).where(Department.id == dept_id)
 
     employee_result = await db.scalars(employee_query)
 
-
     employee = employee_result.first()
-
 
     department_result = await db.scalars(department_query)
     department = department_result.first()
@@ -99,7 +99,7 @@ async def AddEmployeeToDepartment(emp_id: int, dept_id : int, db : AsyncSession)
         raise NotFoundException("Employee not found")
     if department is None:
         raise NotFoundException("Department not found")
-    
+
     employee.departments.append(department)
 
     try:
@@ -112,7 +112,7 @@ async def AddEmployeeToDepartment(emp_id: int, dept_id : int, db : AsyncSession)
     return employee
 
 
-async def DeleteEmployeeFromDepartment(emp_id: int, dept_id :int , db = AsyncSession):
+async def DeleteEmployeeFromDepartment(emp_id: int, dept_id: int, db=AsyncSession):
     employee_query = select(Employee).where(Employee.id == emp_id)
     department_query = select(Department).where(Department.id == dept_id)
 
@@ -126,10 +126,10 @@ async def DeleteEmployeeFromDepartment(emp_id: int, dept_id :int , db = AsyncSes
         raise NotFoundException("Employee not found")
     if department is None:
         raise NotFoundException("Department not found")
-    
+
     if department not in employee.departments:
         raise BadRequestException("Employee is not in the department")
-    
+
     employee.departments.remove(department)
 
     try:
@@ -143,20 +143,19 @@ async def DeleteEmployeeFromDepartment(emp_id: int, dept_id :int , db = AsyncSes
     return employee
 
 
-async def AddUserAddress(emp_id : int, address_data : dict, db : AsyncSession):
+async def AddUserAddress(emp_id: int, address_data: dict, db: AsyncSession):
     employee_query = select(Employee).where(Employee.id == emp_id)
     employee_result = await db.scalars(employee_query)
     empolyee = employee_result.first()
     if empolyee is None:
         raise NotFoundException("Employee not found")
-    
-    address = Address(
-        line_1 = address_data.get("line1", None),
-        city = address_data.get("city", None),
-        postal_code = int(address_data.get("postal_code", None)),
-        country = address_data.get("country", None),
-        employee_id = emp_id
 
+    address = Address(
+        line_1=address_data.get("line1", None),
+        city=address_data.get("city", None),
+        postal_code=int(address_data.get("postal_code", None)),
+        country=address_data.get("country", None),
+        employee_id=emp_id,
     )
     empolyee.addresses.append(address)
 
@@ -170,8 +169,12 @@ async def AddUserAddress(emp_id : int, address_data : dict, db : AsyncSession):
     return empolyee
 
 
-async def UpdateUserAddress(emp_id: int,address_id: int,address_data: dict,db: AsyncSession):
-    query = (select(Address).where(Address.id == address_id,Address.employee_id == emp_id))
+async def UpdateUserAddress(
+    emp_id: int, address_id: int, address_data: dict, db: AsyncSession
+):
+    query = select(Address).where(
+        Address.id == address_id, Address.employee_id == emp_id
+    )
 
     result = await db.scalars(query)
     address = result.first()
@@ -205,8 +208,12 @@ async def UpdateUserAddress(emp_id: int,address_id: int,address_data: dict,db: A
     return address
 
 
-async def SoftDeleteUserAddress(emp_id: int,address_id: int,db: AsyncSession):
-    query = (select(Address).where(Address.id == address_id,Address.employee_id == emp_id,Address.deleted_at.is_(None)))
+async def SoftDeleteUserAddress(emp_id: int, address_id: int, db: AsyncSession):
+    query = select(Address).where(
+        Address.id == address_id,
+        Address.employee_id == emp_id,
+        Address.deleted_at.is_(None),
+    )
 
     result = await db.scalars(query)
     address = result.first()
@@ -223,7 +230,4 @@ async def SoftDeleteUserAddress(emp_id: int,address_id: int,db: AsyncSession):
         await db.rollback()
         raise BadRequestException("Failed to delete address")
 
-    return {
-        "message": "Address deleted successfully",
-        "address_id": address.id
-    }
+    return {"message": "Address deleted successfully", "address_id": address.id}

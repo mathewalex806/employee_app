@@ -2,11 +2,11 @@ from auth.utils import hash_password, verify_password
 
 # from tests.utils import sample_user
 import pytest
+
+
 @pytest.fixture
 def sample_user():
-    return {"id":1, "name":"Alice", "password": "secret123"}
-
-
+    return {"id": 1, "name": "Alice", "password": "secret123"}
 
 
 def test_verify_password_accepts_correct_password(sample_user):
