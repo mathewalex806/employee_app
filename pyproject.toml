@@ -29,3 +29,12 @@ dev = [
 [tool.poe.tasks]
 test = "pytest"
 "test:cov" = "pytest --cov=. --cov-report=term-missing"
+
+[tool.pytest.ini_options]
+testpaths      = ["tests"]
+           # only walk tests/, not the whole repo
+python_files   = ["test_*.py"]
+        # files pytest treats as test files
+python_classes = ["Test*"]
+            # class names that group tests
+python_functions = ["test_*"]
