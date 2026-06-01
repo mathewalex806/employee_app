@@ -72,7 +72,8 @@ async def GetUserById(id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put(
-    "/user/{id}", status_code=status.HTTP_200_OK, response_model=EmployeeResponse
+    "/user/{id}", status_code=status.HTTP_200_OK, response_model=EmployeeResponse,
+    dependencies=[Depends(require_role(EmployeeRole.HR))]
 )
 async def UpdateUserById(
     id: int, body: EmployeeCreate, db: AsyncSession = Depends(get_db)
@@ -86,14 +87,16 @@ async def UpdateUserById(
     return updated_employee
 
 
-@router.delete("/user/{id}", status_code=status.HTTP_200_OK)
+@router.delete("/user/{id}", status_code=status.HTTP_200_OK, 
+    dependencies=[Depends(require_role(EmployeeRole.HR))])
 async def DeleteUserById(id: int, db: AsyncSession = Depends(get_db)):
 
     deleted_employee = await emp_service.DeleteUserByIdService(id=id, db=db)
     return deleted_employee
 
 
-@router.post("/employee/{emp_id}/department/{dept_id}", status_code=status.HTTP_200_OK)
+@router.post("/employee/{emp_id}/department/{dept_id}", status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_role(EmployeeRole.HR))])
 async def AddEmployeeToDepartment(
     emp_id: int, dept_id: int, db: AsyncSession = Depends(get_db)
 ):
@@ -104,7 +107,8 @@ async def AddEmployeeToDepartment(
 
 
 @router.delete(
-    "/employee/{emp_id}/department/{dept_id}", status_code=status.HTTP_200_OK
+    "/employee/{emp_id}/department/{dept_id}", status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_role(EmployeeRole.HR))]
 )
 async def DeleteEmployeeFromDepartment(
     emp_id: int, dept_id: int, db: AsyncSession = Depends(get_db)
@@ -119,6 +123,7 @@ async def DeleteEmployeeFromDepartment(
     "/employee/{emp_id}/address",
     status_code=status.HTTP_201_CREATED,
     response_model=EmployeeResponseAddress,
+    dependencies=[Depends(require_role(EmployeeRole.HR))]
 )
 async def AddUserAddress(
     emp_id: int, body: AddressCreate, db: AsyncSession = Depends(get_db)
@@ -143,6 +148,7 @@ async def AddUserAddress(
     "/employee/{emp_id}/address",
     status_code=status.HTTP_200_OK,
     response_model=AddressResponse,
+    dependencies=[Depends(require_role(EmployeeRole.HR))]
 )
 async def UpdateUserAddress(
     emp_id: int,
@@ -166,7 +172,8 @@ async def UpdateUserAddress(
     return result
 
 
-@router.delete("/employee/{emp_id}/address/{address_id}", status_code=200)
+@router.delete("/employee/{emp_id}/address/{address_id}", status_code=200,
+    dependencies=[Depends(require_role(EmployeeRole.HR))])
 async def DeleteUserAddress(
     emp_id: int, address_id: int, db: AsyncSession = Depends(get_db)
 ):
