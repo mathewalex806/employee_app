@@ -10,13 +10,15 @@ from database.connection import get_db
 from exceptions.handlers import NotFoundException, UnauthorizedException
 from auth.schemas import LoginRequest, TokenResponse, TokenRefresh, AccessToken
 from fastapi.security import OAuth2PasswordRequestForm
-
+import logging
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=AccessToken)
 async def login(form : OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    logger.info(f"User {form.username} is logging in.")
     token = await auth_service.login(db, form.username, form.password)
     return AccessToken(access_token=token)
 

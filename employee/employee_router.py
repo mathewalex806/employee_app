@@ -15,6 +15,9 @@ from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse, Em
 from auth.dependencies import get_current_user, require_role
 from auth.schemas import TokenPayload
 from models.employee import EmployeeRole
+import logging
+logger = logging.getLogger(__name__)
+
 
 router = APIRouter(prefix="/api/v1", tags=["Employee"])
 
@@ -37,8 +40,7 @@ async def create_employee(body: EmployeeCreate, db:AsyncSession = Depends(get_db
 
 @router.get("/users", status_code=status.HTTP_200_OK, response_model= list[EmployeeResponse])
 async def GetUsers(db:AsyncSession = Depends(get_db), _current_user : TokenPayload = Depends(get_current_user)):
-    name = "Alex"
-    print(f"{name}")
+
     employees = await emp_service.GetAllUsers(db=db)
     return employees
 
