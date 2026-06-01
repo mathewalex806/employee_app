@@ -168,3 +168,73 @@ async def AddUserAddress(emp_id : int, address_data : dict, db : AsyncSession):
         raise BadRequestException("Failed to add address")
     await db.refresh(empolyee)
     return empolyee
+
+
+async def UpdateUserAddress(emp_id: int,address_id: int,address_data: dict,db: AsyncSession):
+    query = (select(Address).where(Address.id == address_id,Address.employee_id == emp_id))
+
+    result = await db.scalars(query)
+    address = result.first()
+
+    if address is None:
+        raise NotFoundException("Address not found")
+
+    if "line1" in address_data:
+        address.line_1 = address_data["line1"]
+
+    if "city" in address_data:
+        address.city = address_data["city"]
+
+    if "postal_code" in address_data:
+        address.postal_code = (
+            int(address_data["postal_code"])
+            if address_data["postal_code"] is not None
+            else None
+        )
+
+    if "country" in address_data:
+        address.country = address_data["country"]
+
+    try:
+        await db.commit()
+        await db.refresh(address)
+    except Exception:
+        await db.rollback()
+        raise BadRequestException("Failed to update address")
+
+    return address
+
+
+async def SoftDeleteUserAddress(
+    emp_id: int,
+    address_id: int,
+    db: AsyncSession
+):
+    query = (
+        select(Address)
+        .where(
+            Address.id == address_id,
+            Address.employee_id == emp_id,
+            Address.deleted_at.is_(None)
+        )
+    )
+
+    result = await db.scalars(query)
+    address = result.first()
+
+    if address is None:
+        raise NotFoundException("Address not found")
+
+    address.deleted_at = datetime.now(timezone.utc)
+
+    try:
+        await db.commit()
+        await db.refresh(address)
+    except Exception:
+        await db.rollback()
+        raise BadRequestException("Failed to delete address")
+
+    return {
+        "message": "Address deleted successfully",
+        "address_id": address.id
+    }

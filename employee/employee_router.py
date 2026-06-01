@@ -11,7 +11,7 @@ from fastapi import HTTPException, status
 from fastapi import APIRouter, Body
 
 import employee.employee_service as emp_service
-from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse, EmployeeResponseByUserId
+from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse, EmployeeResponseByUserId , AddressResponse , EmployeeResponseAddress
 from auth.dependencies import get_current_user
 from auth.schemas import TokenPayload
 
@@ -34,7 +34,7 @@ async def GetUsers(db:AsyncSession = Depends(get_db), _current_user : TokenPaylo
     employees = await emp_service.GetAllUsers(db=db)
     return employees
 
-@router.get("/user/{id}", status_code=status.HTTP_200_OK, response_model= EmployeeResponseByUserId)
+@router.get("/user/{id}", status_code=status.HTTP_200_OK, response_model= EmployeeResponseAddress)
 async def GetUserById(id:int, db:AsyncSession = Depends(get_db)):
     employee = await emp_service.GetUserById(id=id, db=db)
     return employee
@@ -70,7 +70,7 @@ async def DeleteEmployeeFromDepartment(emp_id: int, dept_id : int, db : AsyncSes
     return result
 
 
-@router.post("/employee/{emp_id}/address", status_code=status.HTTP_201_CREATED)
+@router.post("/employee/{emp_id}/address", status_code=status.HTTP_201_CREATED, response_model=EmployeeResponseAddress)
 async def AddUserAddress(emp_id: int, body: AddressCreate, db: AsyncSession = Depends(get_db)):
     line1 = body.line1
     city = body.city
@@ -85,6 +85,33 @@ async def AddUserAddress(emp_id: int, body: AddressCreate, db: AsyncSession = De
     result = await emp_service.AddUserAddressService(emp_id=emp_id, address_data=address, db=db)
     return result
 
+@router.put("/employee/{emp_id}/address", status_code = status.HTTP_200_OK, response_model=AddressResponse)
+async def UpdateUserAddress(emp_id: int, address_id : int , body : AddressCreate, db : AsyncSession = Depends(get_db)):
+    line1 = body.line1
+    city = body.city
+    postal_code = body.postal_code
+    country = body.country
+    address = {
+        "line1": line1,
+        "city": city,
+        "postal_code": postal_code,
+        "country": country
+    }
+    result = await emp_service.UpdateAddressService(emp_id=emp_id, address_data=address, address_id=address_id,db=db)
+    return result
+
+
+@router.delete("/employee/{emp_id}/address/{address_id}",status_code=200)
+async def DeleteUserAddress(
+    emp_id: int,
+    address_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    return await emp_service.DeleteAddressService(
+        emp_id=emp_id,
+        address_id=address_id,
+        db=db
+    )
 # @router.post("/login", status_code=status.HTTP_200_OK)
 # async def LoginUserByEmail(body: dict = Body(...), db:AsyncSession = Depends(get_db)):
 #     email = body.get("email")

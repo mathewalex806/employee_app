@@ -51,3 +51,22 @@ class EmployeeResponseByUserId(BaseModel):
     created_at : datetime
     updated_at : datetime | None
     deleted_at : datetime | None
+
+
+class AddressResponse(BaseModel):
+    id: int
+    line_1: str | None
+    city: str | None
+    postal_code: int | None
+    country: str | None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EmployeeResponseAddress(BaseModel):
+    id: int
+    name: str
+    email: str
+    addresses: list[AddressResponse]
+
+    model_config = ConfigDict(from_attributes=True)
