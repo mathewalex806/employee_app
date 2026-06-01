@@ -14,8 +14,8 @@ from datetime import datetime, timezone
 from exceptions import NotFoundException, BadRequestException, ConflictException
 from models import Department
 
-async def CreateEmployee(name: str, email: str, password : str,db: AsyncSession)-> Employee:
-    db_employee = Employee(name=name, email= email, password_hash = password)
+async def CreateEmployee(name: str, email: str, password : str,role : str,age : int,db: AsyncSession)-> Employee:
+    db_employee = Employee(name=name, email= email, password_hash = password, role= role, age= age)
     db.add(db_employee)
 
     try:

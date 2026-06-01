@@ -33,6 +33,7 @@ async def login(db: AsyncSession,email: str,password: str) -> str:
         {
             "sub": str(employee.id),
             "email": employee.email,
+            "role": employee.role.value
         }
     )
 

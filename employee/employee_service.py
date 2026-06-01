@@ -13,7 +13,7 @@ from exceptions import BadRequestException, ConflictException, NotFoundException
 from auth import hash_password, verify_password, create_access_token, decode_access_token
 
 
-async def create(db: AsyncSession, name: str, email:str, password:str) -> Employee:
+async def create(db: AsyncSession, name: str, email:str, password:str, role:str, age:int) -> Employee:
     if not isinstance(name, str) or not name.strip():
         raise BadRequestException("Name should not be empty")
     if not isinstance(email, str) or not email.strip():
@@ -23,7 +23,7 @@ async def create(db: AsyncSession, name: str, email:str, password:str) -> Employ
     
     hashed_password = hash_password(password)
     
-    employee = await CreateEmployee(db=db, name=name, email=email, password = hashed_password)
+    employee = await CreateEmployee(db=db, name=name, email=email, password = hashed_password, role= role, age= age)
     return employee
 
 

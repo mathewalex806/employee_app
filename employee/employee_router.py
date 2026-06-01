@@ -12,8 +12,9 @@ from fastapi import APIRouter, Body
 
 import employee.employee_service as emp_service
 from employee.schemas import EmployeeCreate, AddressCreate, EmployeeResponse, EmployeeResponseByUserId , AddressResponse , EmployeeResponseAddress
-from auth.dependencies import get_current_user
+from auth.dependencies import get_current_user, require_role
 from auth.schemas import TokenPayload
+from models.employee import EmployeeRole
 
 router = APIRouter(prefix="/api/v1", tags=["Employee"])
 
@@ -28,8 +29,9 @@ async def create_employee(body: EmployeeCreate, db:AsyncSession = Depends(get_db
     name = body.name
     email = body.email
     password = body.password
-
-    employee =  await emp_service.create(db=db, name=name, email=email, password=password)
+    role = body.role
+    age = body.age
+    employee =  await emp_service.create(db=db, name=name, email=email, password=password, role=role, age = age)
     return employee
 
 
@@ -40,7 +42,7 @@ async def GetUsers(db:AsyncSession = Depends(get_db), _current_user : TokenPaylo
     employees = await emp_service.GetAllUsers(db=db)
     return employees
 
-@router.get("/user/{id}", status_code=status.HTTP_200_OK, response_model= EmployeeResponseAddress)
+@router.get("/user/{id}", status_code=status.HTTP_200_OK, response_model= EmployeeResponseAddress, dependencies=[Depends(require_role(EmployeeRole.HR))])
 async def GetUserById(id:int, db:AsyncSession = Depends(get_db)):
     employee = await emp_service.GetUserById(id=id, db=db)
     return employee
