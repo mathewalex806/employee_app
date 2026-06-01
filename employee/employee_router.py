@@ -17,6 +17,12 @@ from auth.schemas import TokenPayload
 
 router = APIRouter(prefix="/api/v1", tags=["Employee"])
 
+@router.get("/health", status_code = status.HTTP_200_OK)
+def health():
+    return {
+        "message": "Server is healthy"
+    }
+
 @router.post("/employee", status_code=status.HTTP_201_CREATED, response_model=EmployeeResponse)
 async def create_employee(body: EmployeeCreate, db:AsyncSession = Depends(get_db)):
     name = body.name

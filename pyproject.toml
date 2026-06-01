@@ -16,13 +16,16 @@ dependencies = [
     "uvicorn[standard]>=0.48.0",
     "bcrypt>=5.0.0",
     "python-jose[cryptography]>=3.5.0",
+    "greenlet>=3.5.1",
 ]
 
 [dependency-groups]
 dev = [
+    "aiosqlite>=0.22.1",
     "httpx>=0.28.1",
     "poethepoet>=0.46.0",
     "pytest>=9.0.3",
+    "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
 ]
 
