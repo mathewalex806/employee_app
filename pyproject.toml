@@ -20,5 +20,12 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
     "poethepoet>=0.46.0",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
 ]
+
+[tool.poe.tasks]
+test = "pytest"
+"test:cov" = "pytest --cov=. --cov-report=term-missing"

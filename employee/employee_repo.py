@@ -205,19 +205,8 @@ async def UpdateUserAddress(emp_id: int,address_id: int,address_data: dict,db: A
     return address
 
 
-async def SoftDeleteUserAddress(
-    emp_id: int,
-    address_id: int,
-    db: AsyncSession
-):
-    query = (
-        select(Address)
-        .where(
-            Address.id == address_id,
-            Address.employee_id == emp_id,
-            Address.deleted_at.is_(None)
-        )
-    )
+async def SoftDeleteUserAddress(emp_id: int,address_id: int,db: AsyncSession):
+    query = (select(Address).where(Address.id == address_id,Address.employee_id == emp_id,Address.deleted_at.is_(None)))
 
     result = await db.scalars(query)
     address = result.first()
