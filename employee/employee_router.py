@@ -102,16 +102,12 @@ async def UpdateUserAddress(emp_id: int, address_id : int , body : AddressCreate
 
 
 @router.delete("/employee/{emp_id}/address/{address_id}",status_code=200)
-async def DeleteUserAddress(
-    emp_id: int,
-    address_id: int,
-    db: AsyncSession = Depends(get_db)
-):
-    return await emp_service.DeleteAddressService(
-        emp_id=emp_id,
-        address_id=address_id,
-        db=db
-    )
+async def DeleteUserAddress(emp_id: int,address_id: int,db: AsyncSession = Depends(get_db)):
+    return await emp_service.DeleteAddressService(emp_id=emp_id,address_id=address_id,db=db)
+
+
+
+
 # @router.post("/login", status_code=status.HTTP_200_OK)
 # async def LoginUserByEmail(body: dict = Body(...), db:AsyncSession = Depends(get_db)):
 #     email = body.get("email")

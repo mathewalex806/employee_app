@@ -2,16 +2,21 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, EmailStr, mo
 
 
 class LoginRequest(BaseModel):
-    email : str 
-    password : str = Field(min_length=6)
+    email: EmailStr
+    password: str = Field(min_length=6)
 
 
 class TokenResponse(BaseModel):
     token : str
+    refresh_token : str
 
 
 class TokenPayload(BaseModel):
     """Decoded JWT payload."""
 
-    id: int
-    email: str
+    sub: str
+    email: str | None = None
+    type: str | None = None
+
+class TokenRefresh(BaseModel):
+    refresh_token:str

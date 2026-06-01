@@ -6,9 +6,10 @@ from config import settings
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_expiry_minutes)
-    to_encode["exp"] = expire
-    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    to_encode["type"] = "access"
+    to_encode["exp"] = datetime.now(timezone.utc) + timedelta(minutes=15)
+
+    return jwt.encode(to_encode, settings.jwt_secret, settings.jwt_algorithm)
 
 def decode_access_token(token:str) -> dict | None:
     try:
@@ -17,7 +18,12 @@ def decode_access_token(token:str) -> dict | None:
         return None
 
 
+def create_refresh_token(data: dict) -> str:
+    to_encode = data.copy()
+    to_encode["type"] = "refresh"
+    to_encode["exp"] = datetime.now(timezone.utc) + timedelta(days=7)
 
+    return jwt.encode(to_encode, settings.jwt_secret, settings.jwt_algorithm)
 
 
 def hash_password(plain:str) -> str:
