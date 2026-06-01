@@ -8,34 +8,45 @@ from exceptions import BadRequestException
 from auth.utils import create_access_token, decode_access_token, verify_password, create_refresh_token
 from database.connection import get_db
 from exceptions.handlers import NotFoundException, UnauthorizedException
-from auth.schemas import LoginRequest, TokenResponse, TokenRefresh
+from auth.schemas import LoginRequest, TokenResponse, TokenRefresh, AccessToken
+from fastapi.security import OAuth2PasswordRequestForm
+
+
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
+@router.post("/login", response_model=AccessToken)
+async def login(form : OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    token = await auth_service.login(db, form.username, form.password)
+    return AccessToken(access_token=token)
 
 
-@router.post("/login", response_model=TokenResponse)
-async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
 
-    employee = await auth_service.login(db, body.email)
-    if employee is None:
-        raise NotFoundException("User not found")
+# @router.post("/login", response_model=TokenResponse)
+# async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
 
-    if not verify_password(body.password, employee.password_hash):
-        raise UnauthorizedException("User password does not match")
+#     employee = await auth_service.login(db, body.email)
+#     if employee is None:
+#         raise NotFoundException("User not found")
 
-    payload = {
-        "sub": str(employee.id),
-        "email": employee.email
-    }
+#     if not verify_password(body.password, employee.password_hash):
+#         raise UnauthorizedException("User password does not match")
 
-    access_token = create_access_token(payload)
-    refresh_token = create_refresh_token(payload)
+#     payload = {
+#         "sub": str(employee.id),
+#         "email": employee.email
+#     }
 
-    return TokenResponse(
-        token=access_token,
-        refresh_token=refresh_token
-    )
+#     access_token = create_access_token(payload)
+#     refresh_token = create_refresh_token(payload)
+
+#     return TokenResponse(
+#         token=access_token,
+#         refresh_token=refresh_token
+#     )
+
+
+
 
 @router.post("/refresh")
 async def refresh(body: TokenRefresh):

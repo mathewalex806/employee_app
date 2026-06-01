@@ -20,3 +20,7 @@ class TokenPayload(BaseModel):
 
 class TokenRefresh(BaseModel):
     refresh_token:str
+
+class AccessToken(BaseModel):
+    access_token : str
+    token_type: str = "bearer"

@@ -17,12 +17,20 @@ if TYPE_CHECKING:
     from models.department import Department
     from models.employee_department_junction import EmployeeDepartmentJunction
 
-
+import enum
+from sqlalchemy import Enum
 
 def _datetime_to_iso(value: datetime | None) -> str | None:
     if value is None:
         return None
     return value.isoformat()
+
+
+class EmployeeRole(str, enum.Enum):
+    UI = "UI"
+    UX = "UX"
+    DEVELOPER = "Developer"
+    HR = "HR"
 
 
 class Employee(Entity):
@@ -34,6 +42,13 @@ class Employee(Entity):
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
     password_hash : Mapped[str] = mapped_column(String(255), nullable=False)
+
+    role : Mapped[EmployeeRole] = mapped_column(
+        Enum(EmployeeRole, name="employeerole",values_callable=lambda enum_cls: [e.value for e in enum_cls]),
+        nullable=False,
+        server_default=EmployeeRole.DEVELOPER.value
+            
+    )
     addresses: Mapped[list["Address"]] = relationship(
         "Address",
         back_populates="employee",
