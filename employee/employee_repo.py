@@ -41,7 +41,7 @@ async def GetUserById(id: int, db: AsyncSession):
     result = await db.scalars(query)
     employee = result.first()
     if result is None or employee is None:
-        raise NotFoundException("Employee not found")
+        raise NotFoundException(f"Employee not found {id}")
     return employee
 
 
