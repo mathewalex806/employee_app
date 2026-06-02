@@ -4,7 +4,7 @@ Auth Service file
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from auth.utils import create_access_token, verify_password
+from auth.utils import create_access_token, verify_password, create_refresh_token
 from exceptions.handlers import UnauthorizedException
 from models.employee import Employee
 
@@ -33,5 +33,8 @@ async def login(db: AsyncSession, email: str, password: str) -> str:
     token = create_access_token(
         {"sub": str(employee.id), "email": employee.email, "role": employee.role.value}
     )
+    refresh = create_refresh_token(
+        {"sub": str(employee.id), "email": employee.email, "role": employee.role.value}
+    )
 
-    return token
+    return {"token": token, "refresh": refresh}

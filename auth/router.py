@@ -19,8 +19,11 @@ async def login(
     form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
     logger.info(f"User {form.username} is logging in.")
-    token = await auth_service.login(db, form.username, form.password)
-    return AccessToken(access_token=token)
+    token_dict = await auth_service.login(db, form.username, form.password)
+    return AccessToken(
+        access_token=token_dict["token"],
+        refresh_token=token_dict["refresh"],
+    )
 
 
 # @router.post("/login", response_model=TokenResponse)
