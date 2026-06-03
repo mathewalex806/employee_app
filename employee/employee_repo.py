@@ -3,23 +3,37 @@ Employee repo
 """
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from models.address import Address
-from models.employee import Employee
+from models.employee import Employee, EmployeeRole
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
 from exceptions import NotFoundException, BadRequestException, ConflictException
 from models import Department
+from employee.schemas import AddressCreate
 
 
 async def CreateEmployee(
-    name: str, email: str, password: str, role: str, age: int, db: AsyncSession
+    name: str,
+    email: str,
+    password: str,
+    role: str,
+    age: int,
+    db: AsyncSession,
+    address: AddressCreate,
 ) -> Employee:
     db_employee = Employee(
         name=name, email=email, password_hash=password, role=role, age=age
     )
     db.add(db_employee)
-
+    user_address = Address(
+        line_1=address.line1,
+        city=address.city,
+        postal_code=int(address.postal_code),
+        country=address.country,
+    )
+    db_employee.addresses.append(user_address)
     try:
         await db.commit()
     except IntegrityError:
@@ -36,7 +50,11 @@ async def GetAllEmployee(db: AsyncSession = AsyncSession):
 
 
 async def GetUserById(id: int, db: AsyncSession):
-    query = select(Employee).where(Employee.id == id)
+    query = (
+        select(Employee)
+        .options(selectinload(Employee.addresses.and_(Address.deleted_at.is_(None))))
+        .where(Employee.id == id)
+    )
 
     result = await db.scalars(query)
     employee = result.first()
@@ -45,7 +63,9 @@ async def GetUserById(id: int, db: AsyncSession):
     return employee
 
 
-async def UpdateUserByIdRepo(id: int, name: str, email: str, db: AsyncSession):
+async def UpdateUserByIdRepo(
+    id: int, name: str, email: str, db: AsyncSession, age: int, role: EmployeeRole
+):
     query = select(Employee).where(Employee.id == id)
     result = await db.scalars(query)
     employee = result.first()
@@ -53,7 +73,8 @@ async def UpdateUserByIdRepo(id: int, name: str, email: str, db: AsyncSession):
         raise NotFoundException("User not found")
     employee.name = name
     employee.email = email
-
+    employee.age = age
+    employee.role = role
     try:
         await db.commit()
     except IntegrityError:
@@ -144,7 +165,11 @@ async def DeleteEmployeeFromDepartment(emp_id: int, dept_id: int, db=AsyncSessio
 
 
 async def AddUserAddress(emp_id: int, address_data: dict, db: AsyncSession):
-    employee_query = select(Employee).where(Employee.id == emp_id)
+    employee_query = (
+        select(Employee)
+        .options(selectinload(Employee.addresses.and_(Address.deleted_at.is_(None))))
+        .where(Employee.id == emp_id)
+    )
     employee_result = await db.scalars(employee_query)
     empolyee = employee_result.first()
     if empolyee is None:

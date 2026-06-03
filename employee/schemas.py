@@ -46,15 +46,6 @@ class EmployeeCreate(BaseModel):
     role: EmployeeRole | None = None
 
 
-class EmployeeResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    name: str
-    email: EmailStr
-    age: int | None
-    role: EmployeeRole | None = None
-
-
 class EmployeeResponseByUserId(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
@@ -76,10 +67,53 @@ class AddressResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class DepartmentSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    name: str
+
+
 class EmployeeResponseAddress(BaseModel):
     id: int
     name: str
     email: str
     addresses: list[AddressResponse]
+    departments: list[DepartmentSchema]
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class EmployeeResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
+    email: EmailStr
+    age: int | None
+    role: EmployeeRole | None = None
+    address: AddressResponse | None = None
+
+
+class UpdateEmployeeDetailsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
+    email: EmailStr
+    age: int | None
+    role: EmployeeRole | None = None
+
+
+class UpdateEmployeeDetailsRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    name: str
+    email: EmailStr
+    age: int | None
+    role: EmployeeRole | None = None
+
+
+class AddEmployeeToDepartmentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
+    email: EmailStr
+    age: int | None
+    role: EmployeeRole | None = None
+    departments: list[DepartmentSchema]

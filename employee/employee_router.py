@@ -13,9 +13,12 @@ import employee.employee_service as emp_service
 from employee.schemas import (
     EmployeeCreate,
     AddressCreate,
-    EmployeeResponse,
+    # EmployeeResponse,
     AddressResponse,
     EmployeeResponseAddress,
+    UpdateEmployeeDetailsRequest,
+    UpdateEmployeeDetailsResponse,
+    AddEmployeeToDepartmentResponse,
 )
 from auth.dependencies import get_current_user, require_role
 from auth.schemas import TokenPayload
@@ -34,22 +37,39 @@ def health():
 
 
 @router.post(
-    "/employee", status_code=status.HTTP_201_CREATED, response_model=EmployeeResponse
+    "/employee",
+    status_code=status.HTTP_201_CREATED,
+    response_model=EmployeeResponseAddress,
 )
-async def create_employee(body: EmployeeCreate, db: AsyncSession = Depends(get_db)):
+async def create_employee(
+    body: EmployeeCreate,
+    db: AsyncSession = Depends(get_db),
+    _current_user: TokenPayload = Depends(get_current_user),
+):
+
     name = body.name
     email = body.email
     password = body.password
     role = body.role
     age = body.age
+    address = body.address
+
     employee = await emp_service.create(
-        db=db, name=name, email=email, password=password, role=role, age=age
+        db=db,
+        name=name,
+        email=email,
+        password=password,
+        role=role,
+        age=age,
+        address=address,
     )
     return employee
 
 
 @router.get(
-    "/users", status_code=status.HTTP_200_OK, response_model=list[EmployeeResponse]
+    "/users",
+    status_code=status.HTTP_200_OK,
+    response_model=list[EmployeeResponseAddress],
 )
 async def GetUsers(
     db: AsyncSession = Depends(get_db),
@@ -74,17 +94,18 @@ async def GetUserById(id: int, db: AsyncSession = Depends(get_db)):
 @router.put(
     "/user/{id}",
     status_code=status.HTTP_200_OK,
-    response_model=EmployeeResponse,
+    response_model=UpdateEmployeeDetailsResponse,
     dependencies=[Depends(require_role(EmployeeRole.HR))],
 )
 async def UpdateUserById(
-    id: int, body: EmployeeCreate, db: AsyncSession = Depends(get_db)
+    id: int, body: UpdateEmployeeDetailsRequest, db: AsyncSession = Depends(get_db)
 ):
     name = body.name
     email = body.email
-
+    age = body.age
+    role = body.role
     updated_employee = await emp_service.UpdateUserByIdService(
-        db=db, name=name, email=email, id=id
+        db=db, name=name, email=email, id=id, age=age, role=role
     )
     return updated_employee
 
@@ -104,6 +125,7 @@ async def DeleteUserById(id: int, db: AsyncSession = Depends(get_db)):
     "/employee/{emp_id}/department/{dept_id}",
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(require_role(EmployeeRole.HR))],
+    response_model=AddEmployeeToDepartmentResponse,
 )
 async def AddEmployeeToDepartment(
     emp_id: int, dept_id: int, db: AsyncSession = Depends(get_db)
@@ -118,6 +140,7 @@ async def AddEmployeeToDepartment(
     "/employee/{emp_id}/department/{dept_id}",
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(require_role(EmployeeRole.HR))],
+    response_model=AddEmployeeToDepartmentResponse,
 )
 async def DeleteEmployeeFromDepartment(
     emp_id: int, dept_id: int, db: AsyncSession = Depends(get_db)

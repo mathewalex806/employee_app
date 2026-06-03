@@ -3,7 +3,7 @@ Employee service
 """
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.employee import Employee
+from models.employee import Employee, EmployeeRole
 from employee.employee_repo import (
     CreateEmployee,
     GetAllEmployee,
@@ -18,10 +18,17 @@ from employee.employee_repo import (
 )
 from exceptions import BadRequestException
 from auth import hash_password
+from employee.schemas import AddressCreate
 
 
 async def create(
-    db: AsyncSession, name: str, email: str, password: str, role: str, age: int
+    db: AsyncSession,
+    name: str,
+    email: str,
+    password: str,
+    role: str,
+    age: int,
+    address: AddressCreate,
 ) -> Employee:
     if not isinstance(name, str) or not name.strip():
         raise BadRequestException("Name should not be empty")
@@ -33,7 +40,13 @@ async def create(
     hashed_password = hash_password(password)
 
     employee = await CreateEmployee(
-        db=db, name=name, email=email, password=hashed_password, role=role, age=age
+        db=db,
+        name=name,
+        email=email,
+        password=hashed_password,
+        role=role,
+        age=age,
+        address=address,
     )
     return employee
 
@@ -49,7 +62,7 @@ async def GetUserByIdService(id: int, db: AsyncSession):
 
 
 async def UpdateUserByIdService(
-    db: AsyncSession, name: str, email: str, id: int
+    db: AsyncSession, name: str, email: str, id: int, age: int, role: EmployeeRole
 ) -> Employee:
     if not isinstance(name, str) or not name.strip():
         raise
@@ -58,7 +71,15 @@ async def UpdateUserByIdService(
     if not isinstance(id, int) or id is None:
         raise BadRequestException("ID should not be empty")
 
-    updatedEmployee = await UpdateUserByIdRepo(id=id, name=name, email=email, db=db)
+    if not isinstance(age, int) or age is None:
+        raise BadRequestException("Age should not be empty")
+
+    if not isinstance(role, EmployeeRole) or role is None:
+        raise BadRequestException("Employee role should not be empty")
+
+    updatedEmployee = await UpdateUserByIdRepo(
+        id=id, name=name, email=email, db=db, age=age, role=role
+    )
     return updatedEmployee
 
 
