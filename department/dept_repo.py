@@ -28,7 +28,7 @@ async def GetDepartmentByIdRepo(id: int, db: AsyncSession):
     result = await db.scalars(query)
     department = result.first()
     if department is None:
-        raise NotFoundException("Department not found")
+        raise NotFoundException(f"Department not found {id}")
     return department
 
 
