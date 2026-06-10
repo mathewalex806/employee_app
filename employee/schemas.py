@@ -51,6 +51,7 @@ class EmployeeResponseByUserId(BaseModel):
     id: int
     name: str
     email: EmailStr
+    role: str
     age: int | None
     created_at: datetime
     updated_at: datetime | None
@@ -76,9 +77,10 @@ class EmployeeResponseAddress(BaseModel):
     id: int
     name: str
     email: str
+    role: str
     addresses: list[AddressResponse]
     departments: list[DepartmentSchema]
-
+    created_at: datetime | None
     model_config = ConfigDict(from_attributes=True)
 
 
