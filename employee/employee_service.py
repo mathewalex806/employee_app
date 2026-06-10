@@ -3,7 +3,7 @@ Employee service
 """
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.employee import Employee, EmployeeRole
+from models.employee import Employee, EmployeeRole, Status
 from employee.employee_repo import (
     CreateEmployee,
     GetAllEmployee,
@@ -29,6 +29,8 @@ async def create(
     role: str,
     age: int,
     address: AddressCreate,
+    status: Status,
+    exp: str,
 ) -> Employee:
     if not isinstance(name, str) or not name.strip():
         raise BadRequestException("Name should not be empty")
@@ -47,6 +49,8 @@ async def create(
         role=role,
         age=age,
         address=address,
+        status=status,
+        exp=exp,
     )
     return employee
 
@@ -62,7 +66,14 @@ async def GetUserByIdService(id: int, db: AsyncSession):
 
 
 async def UpdateUserByIdService(
-    db: AsyncSession, name: str, email: str, id: int, age: int, role: EmployeeRole
+    db: AsyncSession,
+    name: str,
+    email: str,
+    id: int,
+    age: int,
+    role: EmployeeRole,
+    status: Status,
+    experience: str,
 ) -> Employee:
     if not isinstance(name, str) or not name.strip():
         raise
@@ -78,7 +89,14 @@ async def UpdateUserByIdService(
         raise BadRequestException("Employee role should not be empty")
 
     updatedEmployee = await UpdateUserByIdRepo(
-        id=id, name=name, email=email, db=db, age=age, role=role
+        id=id,
+        name=name,
+        email=email,
+        db=db,
+        age=age,
+        role=role,
+        status=status,
+        experience=experience,
     )
     return updatedEmployee
 

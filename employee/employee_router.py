@@ -53,6 +53,8 @@ async def create_employee(
     role = body.role
     age = body.age
     address = body.address
+    status = body.status
+    exp = body.experience
 
     employee = await emp_service.create(
         db=db,
@@ -62,6 +64,8 @@ async def create_employee(
         role=role,
         age=age,
         address=address,
+        status=status,
+        exp=exp,
     )
     return employee
 
@@ -104,8 +108,18 @@ async def UpdateUserById(
     email = body.email
     age = body.age
     role = body.role
+    experience = body.experience
+    status = body.status
+
     updated_employee = await emp_service.UpdateUserByIdService(
-        db=db, name=name, email=email, id=id, age=age, role=role
+        db=db,
+        name=name,
+        email=email,
+        id=id,
+        age=age,
+        role=role,
+        experience=experience,
+        status=status,
     )
     return updated_employee
 

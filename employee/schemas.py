@@ -9,7 +9,7 @@ from pydantic import (
     model_validator,
 )
 
-from models.employee import EmployeeRole
+from models.employee import EmployeeRole, Status
 
 
 class AddressCreate(BaseModel):
@@ -44,6 +44,8 @@ class EmployeeCreate(BaseModel):
     address: AddressCreate | None = None
     password: str = Field(min_length=6)
     role: EmployeeRole | None = None
+    status: Status | None = None
+    experience: str = Field(min_length=1)
 
 
 class EmployeeResponseByUserId(BaseModel):
@@ -81,6 +83,8 @@ class EmployeeResponseAddress(BaseModel):
     addresses: list[AddressResponse]
     departments: list[DepartmentSchema]
     created_at: datetime | None
+    experience: str | None
+    status: str | None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -100,6 +104,8 @@ class UpdateEmployeeDetailsResponse(BaseModel):
     name: str
     email: EmailStr
     age: int | None
+    status: Status
+    experience: str
     role: EmployeeRole | None = None
 
 
@@ -108,6 +114,8 @@ class UpdateEmployeeDetailsRequest(BaseModel):
     name: str
     email: EmailStr
     age: int | None
+    experience: str | None
+    status: Status | None = None
     role: EmployeeRole | None = None
 
 

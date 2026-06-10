@@ -5,7 +5,7 @@ Employee repo
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from models.address import Address
-from models.employee import Employee, EmployeeRole
+from models.employee import Employee, EmployeeRole, Status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
@@ -22,9 +22,17 @@ async def CreateEmployee(
     age: int,
     db: AsyncSession,
     address: AddressCreate,
+    status: Status,
+    exp: str,
 ) -> Employee:
     db_employee = Employee(
-        name=name, email=email, password_hash=password, role=role, age=age
+        name=name,
+        email=email,
+        password_hash=password,
+        role=role,
+        age=age,
+        status=status,
+        experience=exp,
     )
     db.add(db_employee)
     user_address = Address(
@@ -64,7 +72,14 @@ async def GetUserById(id: int, db: AsyncSession):
 
 
 async def UpdateUserByIdRepo(
-    id: int, name: str, email: str, db: AsyncSession, age: int, role: EmployeeRole
+    id: int,
+    name: str,
+    email: str,
+    db: AsyncSession,
+    age: int,
+    role: EmployeeRole,
+    status: Status,
+    experience=str,
 ):
     query = select(Employee).where(Employee.id == id)
     result = await db.scalars(query)
@@ -75,6 +90,8 @@ async def UpdateUserByIdRepo(
     employee.email = email
     employee.age = age
     employee.role = role
+    employee.experience = experience
+    employee.status = status
     try:
         await db.commit()
     except IntegrityError:
