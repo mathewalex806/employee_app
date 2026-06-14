@@ -84,7 +84,7 @@ class EmployeeResponseAddress(BaseModel):
     departments: list[DepartmentSchema]
     created_at: datetime | None
     experience: str | None
-    status: str | None
+    status: Status | None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -127,3 +127,16 @@ class AddEmployeeToDepartmentResponse(BaseModel):
     age: int | None
     role: EmployeeRole | None = None
     departments: list[DepartmentSchema]
+
+
+class GetAllUsersSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
+    email: EmailStr
+    age: int | None
+    role: EmployeeRole | None = None
+    departments: list[DepartmentSchema]
+    addresses: list[AddressCreate]
+    experience: str
+    status: str
