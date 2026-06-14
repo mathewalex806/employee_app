@@ -22,7 +22,7 @@ from employee.schemas import (
 )
 from auth.dependencies import get_current_user, require_role
 from auth.schemas import TokenPayload
-from models.employee import EmployeeRole
+from models.employee import EmployeeRole, Status
 import logging
 
 logger = logging.getLogger(__name__)
@@ -229,6 +229,16 @@ async def DeleteUserAddress(
     return await emp_service.DeleteAddressService(
         emp_id=emp_id, address_id=address_id, db=db
     )
+
+
+@router.get(
+    "/users/status", status_code=200, response_model=list[EmployeeResponseAddress]
+)
+async def GetUsersByStatus(
+    query: Status = "Active", db: AsyncSession = Depends(get_db)
+):
+
+    return await emp_service.GetUsersByStatusService(status=query, db=db)
 
 
 # @router.post("/login", status_code=status.HTTP_200_OK)

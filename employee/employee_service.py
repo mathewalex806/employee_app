@@ -8,6 +8,7 @@ from employee.employee_repo import (
     CreateEmployee,
     GetAllEmployee,
     GetUserById,
+    GetUsersByStatus,
     UpdateUserByIdRepo,
     DeleteUserByIdRepo,
     AddEmployeeToDepartment,
@@ -159,5 +160,11 @@ async def UpdateAddressService(
 
 async def DeleteAddressService(emp_id: int, address_id: int, db: AsyncSession):
     result = await SoftDeleteUserAddress(emp_id=emp_id, address_id=address_id, db=db)
+
+    return result
+
+
+async def GetUsersByStatusService(status: Status, db: AsyncSession):
+    result = await GetUsersByStatus(status=status, db=db)
 
     return result

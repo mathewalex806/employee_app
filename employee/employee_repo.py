@@ -273,3 +273,12 @@ async def SoftDeleteUserAddress(emp_id: int, address_id: int, db: AsyncSession):
         raise BadRequestException("Failed to delete address")
 
     return {"message": "Address deleted successfully", "address_id": address.id}
+
+
+async def GetUsersByStatus(status: Status, db: AsyncSession):
+
+    query = select(Employee).where(Employee.status == status)
+    result = await db.scalars(query)
+    employees = result.all()
+    print(employees)
+    return employees
