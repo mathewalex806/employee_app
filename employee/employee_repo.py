@@ -277,7 +277,9 @@ async def SoftDeleteUserAddress(emp_id: int, address_id: int, db: AsyncSession):
 
 async def GetUsersByStatus(status: Status, db: AsyncSession):
 
-    query = select(Employee).where(Employee.status == status)
+    query = select(Employee).where(
+        Employee.status == status, Employee.deleted_at.is_(None)
+    )
     result = await db.scalars(query)
     employees = result.all()
     print(employees)
