@@ -3,7 +3,7 @@ from pypdf import PdfReader
 from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from langchain_google_genai import GoogleGenerativeAIEmbeddings  # changed
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import chromadb
 import uuid
 
@@ -50,6 +50,24 @@ def ingest_policies_directory(path: str = "hr_policies"):
     return raw_document
 
 
+def ingest_file(path: str):
+    file_path = Path(path)
+    if file_path.suffix not in ALLOWED_SUFFIX:
+        print("Failed to load document: Unsupported type")
+        return
+    if file_path.suffix == ".pdf":
+        return [ingest_pdf(path=file_path)]
+    elif file_path.suffix == ".txt" or file_path.suffix == ".md":
+        return [ingest_text(path=file_path)]
+
+
+def load_file(path: str):
+    ingested_file = ingest_file(path=path)
+    chunks = chunk_documents(ingested_file)
+    embeddings = embed_chunks(chunks=chunks)
+    store_in_chroma(chunks=chunks, embeddings=embeddings)
+
+
 def chunk_documents(raw_documents: list[RawDocument]):
     splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=50)
     documents = [
@@ -63,7 +81,7 @@ def chunk_documents(raw_documents: list[RawDocument]):
 
 
 def embed_chunks(chunks: list[Document]):
-    embedding_model = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL)  # changed
+    embedding_model = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL)
     texts = [chunk.page_content for chunk in chunks]
     return embedding_model.embed_documents(texts)
 

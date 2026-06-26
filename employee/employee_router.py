@@ -26,6 +26,10 @@ from models.employee import EmployeeRole, Status
 import logging
 
 from rag.agent import create_hr_agent
+from fastapi import UploadFile, File
+import shutil
+
+from rag.ingestion import load_file
 
 logger = logging.getLogger(__name__)
 
@@ -251,6 +255,18 @@ async def chat(message: str):
     agent = create_hr_agent()
     response = await agent.arun(message)
     return {"response": response.content}
+
+
+@router.post("/upload-policy")
+async def upload_policy(file: UploadFile = File(...)):
+    temp_path = f"/tmp/{file.filename}"
+
+    with open(temp_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    load_file(temp_path)
+
+    return {"message": f"{file.filename} ingested successfully"}
 
 
 # @router.post("/login", status_code=status.HTTP_200_OK)
