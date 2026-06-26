@@ -19,28 +19,28 @@ services:
       retries: 5
 
   server:
-   build:
-    context: .
-    dockerfile: dockerfile
-   container_name: employee_server_container
-   ports:
-    - "8000:8000"
-   depends_on:
-    - postgres
-   env_file:
-    - .env
-   environment:
-    DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/employee_db_1
-   develop:
-    watch:
-     - path: .
-       target: /app
-       action: sync
-     - path: ./uv.lock
-       action: rebuild
-   command: ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port",  "8000", "--reload"]
-
-
+    build:
+      context: .
+      dockerfile: dockerfile
+      args:
+        - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    container_name: employee_server_container
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/employee_db_1
+    develop:
+      watch:
+        - path: .
+          target: /app
+          action: sync
+        - path: ./uv.lock
+          action: rebuild
+    command: ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 volumes:
   postgres_data:

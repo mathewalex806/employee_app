@@ -25,6 +25,8 @@ from auth.schemas import TokenPayload
 from models.employee import EmployeeRole, Status
 import logging
 
+from rag.agent import create_hr_agent
+
 logger = logging.getLogger(__name__)
 
 
@@ -239,6 +241,16 @@ async def GetUsersByStatus(
 ):
 
     return await emp_service.GetUsersByStatusService(status=query, db=db)
+
+
+@router.post(
+    "/chat",
+    status_code=200,
+)
+async def chat(message: str):
+    agent = create_hr_agent()
+    response = await agent.arun(message)
+    return {"response": response.content}
 
 
 # @router.post("/login", status_code=status.HTTP_200_OK)
